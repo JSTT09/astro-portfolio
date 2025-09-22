@@ -1,25 +1,18 @@
 name: Deploy to GitHub Pages
 
 on:
-  # Se ejecuta en pushes a la rama main
   push:
     branches: [ main ]
-  # Permite ejecutar manualmente desde la pestaña Actions
   workflow_dispatch:
 
-# Establece permisos del GITHUB_TOKEN para permitir deployment a GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Permite solo un deployment concurrente, saltando runs que están en cola entre runs en progreso
 concurrency:
   group: "pages"
   cancel-in-progress: false
-
-env:
-  BUILD_PATH: "." # ruta del proyecto desde la raíz
 
 jobs:
   build:
@@ -34,7 +27,6 @@ jobs:
         with:
           node-version: "20"
           cache: npm
-          cache-dependency-path: ${{ env.BUILD_PATH }}/package-lock.json
           
       - name: Setup Pages
         id: pages
@@ -42,19 +34,14 @@ jobs:
         
       - name: Install dependencies
         run: npm ci
-        working-directory: ${{ env.BUILD_PATH }}
         
       - name: Build with Astro
-        run: |
-          npm run build \
-            -- --site "${{ steps.pages.outputs.origin }}" \
-            -- --base "${{ steps.pages.outputs.base_path }}"
-        working-directory: ${{ env.BUILD_PATH }}
+        run: npm run build
         
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ env.BUILD_PATH }}/dist
+          path: ./dist
 
   deploy:
     environment:
