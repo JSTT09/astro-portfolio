@@ -1,0 +1,104 @@
+---
+// Componente para mostrar educación
+export interface Props {
+  educacion: Array<{
+    id: number;
+    titulo: string;
+    institucion: string;
+    fecha_inicio: string;
+    fecha_fin?: string;
+  }>;
+}
+
+const { educacion } = Astro.props;
+
+function formatearFecha(fecha) {
+  if (!fecha) return null;
+  return new Date(fecha).toLocaleDateString('es-ES', { 
+    year: 'numeric', 
+    month: 'long' 
+  });
+}
+---
+
+<section class="educacion-section">
+  <h2>Educación</h2>
+  {educacion && educacion.length > 0 ? (
+    educacion.map((edu) => (
+      <div class="educacion-item">
+        <div class="educacion-header">
+          <h3>{edu.titulo}</h3>
+          <span class="periodo">
+            {formatearFecha(edu.fecha_inicio)} - {edu.fecha_fin ? formatearFecha(edu.fecha_fin) : 'Presente'}
+          </span>
+        </div>
+        <p class="institucion">{edu.institucion}</p>
+      </div>
+    ))
+  ) : (
+    <p>No hay información educativa disponible.</p>
+  )}
+</section>
+
+<style>
+  .educacion-section {
+    margin: 2rem 0;
+    padding: 2rem;
+    background: #f9f9f9;
+    border-radius: 8px;
+  }
+  
+  .educacion-section h2 {
+    color: #333;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #28a745;
+    padding-bottom: 0.5rem;
+  }
+  
+  .educacion-item {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+    border-left: 4px solid #28a745;
+  }
+  
+  .educacion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .educacion-header h3 {
+    color: #333;
+    margin: 0;
+    flex: 1;
+  }
+  
+  .periodo {
+    color: #666;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+  
+  .institucion {
+    color: #28a745;
+    font-weight: 500;
+    margin: 0;
+  }
+  
+  @media (max-width: 768px) {
+    .educacion-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .periodo {
+      white-space: normal;
+    }
+  }
+</style>

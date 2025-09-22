@@ -1,0 +1,79 @@
+---
+// Componente para mostrar información de contacto
+export interface Props {
+  contacto: Array<{
+    id: number;
+    nombre: string;
+    email: string;
+    telefono?: string;
+    direccion?: string;
+  }>;
+}
+
+const { contacto } = Astro.props;
+---
+
+<section class="contacto-section">
+  <h2>Información de Contacto</h2>
+  {contacto && contacto.length > 0 ? (
+    contacto.map((contact) => (
+      <div class="contacto-card">
+        <h3>{contact.nombre}</h3>
+        <div class="contacto-info">
+          <p><strong>Email:</strong> <a href={`mailto:${contact.email}`}>{contact.email}</a></p>
+          {contact.telefono && (
+            <p><strong>Teléfono:</strong> <a href={`tel:${contact.telefono}`}>{contact.telefono}</a></p>
+          )}
+          {contact.direccion && (
+            <p><strong>Dirección:</strong> {contact.direccion}</p>
+          )}
+        </div>
+      </div>
+    ))
+  ) : (
+    <p>No hay información de contacto disponible.</p>
+  )}
+</section>
+
+<style>
+  .contacto-section {
+    margin: 2rem 0;
+    padding: 2rem;
+    background: #f9f9f9;
+    border-radius: 8px;
+  }
+  
+  .contacto-section h2 {
+    color: #333;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #007acc;
+    padding-bottom: 0.5rem;
+  }
+  
+  .contacto-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+  }
+  
+  .contacto-card h3 {
+    color: #007acc;
+    margin-bottom: 1rem;
+  }
+  
+  .contacto-info p {
+    margin: 0.5rem 0;
+    color: #666;
+  }
+  
+  .contacto-info a {
+    color: #007acc;
+    text-decoration: none;
+  }
+  
+  .contacto-info a:hover {
+    text-decoration: underline;
+  }
+</style>

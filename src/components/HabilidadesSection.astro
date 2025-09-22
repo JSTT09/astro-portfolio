@@ -1,0 +1,103 @@
+---
+// Componente para mostrar habilidades
+export interface Props {
+  habilidades: Array<{
+    id: number;
+    nombre: string;
+    nivel: 'Básico' | 'Intermedio' | 'Avanzado';
+  }>;
+}
+
+const { habilidades } = Astro.props;
+
+function getNivelColor(nivel: 'Básico' | 'Intermedio' | 'Avanzado'): string {
+  switch(nivel) {
+    case 'Básico': return '#ffc107';
+    case 'Intermedio': return '#fd7e14';
+    case 'Avanzado': return '#28a745';
+    default: return '#6c757d';
+  }
+}
+---
+
+<section class="habilidades-section">
+  <h2>Habilidades</h2>
+  {habilidades && habilidades.length > 0 ? (
+    <div class="habilidades-grid">
+      {habilidades.map((habilidad) => (
+        <div class="habilidad-item">
+          <h4>{habilidad.nombre}</h4>
+          <span 
+            class="nivel-badge"
+            style={`background-color: ${getNivelColor(habilidad.nivel)}`}
+          >
+            {habilidad.nivel}
+          </span>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p>No hay habilidades disponibles.</p>
+  )}
+</section>
+
+<style>
+  .habilidades-section {
+    margin: 2rem 0;
+    padding: 2rem;
+    background: #f9f9f9;
+    border-radius: 8px;
+  }
+  
+  .habilidades-section h2 {
+    color: #333;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #6f42c1;
+    padding-bottom: 0.5rem;
+  }
+  
+  .habilidades-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+  
+  .habilidad-item {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid #6f42c1;
+  }
+  
+  .habilidad-item h4 {
+    color: #333;
+    margin: 0;
+    flex: 1;
+  }
+  
+  .nivel-badge {
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  @media (max-width: 768px) {
+    .habilidades-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .habilidad-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+  }
+</style>

@@ -1,0 +1,263 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ContactoSection from '../components/ContactoSection.astro';
+import EducacionSection from '../components/EducacionSection.astro';
+import ExperienciaSection from '../components/ExperienciaSection.astro';
+import HabilidadesSection from '../components/HabilidadesSection.astro';
+import CertificacionesSection from '../components/CertificacionesSection.astro';
+import { curriculumAPI } from '../lib/api.js';
+
+// Obtener todos los datos del curriculum desde la API de Laravel
+let curriculumData = null;
+let error = null;
+
+try {
+  const response = await curriculumAPI.getCurriculumCompleto();
+  curriculumData = response;
+  console.log('Datos del curriculum obtenidos:', curriculumData);
+} catch (err) {
+  error = err.message;
+  console.error('Error al obtener datos del curriculum:', err);
+}
+---
+
+<Layout title="Mi Curriculum">
+  <main class="curriculum-container">
+    <header class="curriculum-header">
+      <h1>Mi Curriculum Vitae</h1>
+      <p>Información profesional actualizada automáticamente</p>
+    </header>
+
+    {error ? (
+      <div class="error-message">
+        <h2>Error al cargar los datos</h2>
+        <p>No se pudieron obtener los datos del curriculum: {error}</p>
+        <p>Asegúrate de que el servidor Laravel esté funcionando en http://localhost:8000</p>
+      </div>
+    ) : curriculumData ? (
+      <div class="curriculum-content">
+        <!-- Información de Contacto -->
+        {curriculumData.contacto && (
+          <ContactoSection contacto={curriculumData.contacto} />
+        )}
+
+        <!-- Educación -->
+        {curriculumData.educacion && (
+          <EducacionSection educacion={curriculumData.educacion} />
+        )}
+
+        <!-- Experiencia Laboral -->
+        {curriculumData.experiencia_laboral && (
+          <ExperienciaSection experiencia={curriculumData.experiencia_laboral} />
+        )}
+
+        <!-- Habilidades -->
+        {curriculumData.habilidades && (
+          <HabilidadesSection habilidades={curriculumData.habilidades} />
+        )}
+
+        <!-- Certificaciones -->
+        {curriculumData.certificaciones && (
+          <CertificacionesSection certificaciones={curriculumData.certificaciones} />
+        )}
+
+        <!-- Historia (si existe) -->
+        {curriculumData.historia && curriculumData.historia.length > 0 && (
+          <section class="historia-section">
+            <h2>Historia Adicional</h2>
+            {curriculumData.historia.map((item) => (
+              <div class="historia-item">
+                <h3>{item.titulo}</h3>
+                <p>{item.descripcion}</p>
+                {(item.fecha_inicio || item.fecha_fin) && (
+                  <p class="fechas">
+                    {item.fecha_inicio && `Desde: ${new Date(item.fecha_inicio).toLocaleDateString('es-ES')}`}
+                    {item.fecha_fin && ` - Hasta: ${new Date(item.fecha_fin).toLocaleDateString('es-ES')}`}
+                  </p>
+                )}
+              </div>
+            ))}
+          </section>
+        )}
+
+        <!-- Idiomas (si existen) -->
+        {curriculumData.idiomas && curriculumData.idiomas.length > 0 && (
+          <section class="idiomas-section">
+            <h2>Idiomas</h2>
+            <div class="idiomas-grid">
+              {curriculumData.idiomas.map((idioma) => (
+                <div class="idioma-item">
+                  <span class="idioma-nombre">{idioma.idioma}</span>
+                  <span class="idioma-nivel">{idioma.nivel}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+    ) : (
+      <div class="loading-message">
+        <p>Cargando datos del curriculum...</p>
+      </div>
+    )}
+  </main>
+</Layout>
+
+<style>
+  .curriculum-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: system-ui, sans-serif;
+  }
+
+  .curriculum-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 2rem 0;
+    border-bottom: 3px solid #007acc;
+  }
+
+  .curriculum-header h1 {
+    color: #333;
+    margin-bottom: 0.5rem;
+    font-size: 2.5rem;
+  }
+
+  .curriculum-header p {
+    color: #666;
+    font-size: 1.1rem;
+  }
+
+  .error-message {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 2rem;
+    border-radius: 8px;
+    border: 1px solid #f5c6cb;
+    text-align: center;
+  }
+
+  .error-message h2 {
+    margin-top: 0;
+  }
+
+  .loading-message {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+    font-size: 1.1rem;
+  }
+
+  .curriculum-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  /* Estilos para Historia */
+  .historia-section {
+    margin: 2rem 0;
+    padding: 2rem;
+    background: #f9f9f9;
+    border-radius: 8px;
+  }
+
+  .historia-section h2 {
+    color: #333;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #ffc107;
+    padding-bottom: 0.5rem;
+  }
+
+  .historia-item {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+    border-left: 4px solid #ffc107;
+  }
+
+  .historia-item h3 {
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+
+  .historia-item p {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+  }
+
+  .fechas {
+    font-size: 0.9rem;
+    color: #666;
+    font-style: italic;
+  }
+
+  /* Estilos para Idiomas */
+  .idiomas-section {
+    margin: 2rem 0;
+    padding: 2rem;
+    background: #f9f9f9;
+    border-radius: 8px;
+  }
+
+  .idiomas-section h2 {
+    color: #333;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #20c997;
+    padding-bottom: 0.5rem;
+  }
+
+  .idiomas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .idioma-item {
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid #20c997;
+  }
+
+  .idioma-nombre {
+    font-weight: 500;
+    color: #333;
+  }
+
+  .idioma-nivel {
+    background: #20c997;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 768px) {
+    .curriculum-container {
+      padding: 1rem;
+    }
+
+    .curriculum-header h1 {
+      font-size: 2rem;
+    }
+
+    .idiomas-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .idioma-item {
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: flex-start;
+    }
+  }
+</style>

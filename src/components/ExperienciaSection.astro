@@ -1,0 +1,112 @@
+---
+// Componente para mostrar experiencia laboral
+export interface Props {
+  experiencia: Array<{
+    id: number;
+    puesto: string;
+    empresa: string;
+    fecha_inicio: string;
+    fecha_fin?: string;
+    descripcion: string;
+  }>;
+}
+
+const { experiencia } = Astro.props;
+
+function formatearFecha(fecha) {
+  if (!fecha) return null;
+  return new Date(fecha).toLocaleDateString('es-ES', { 
+    year: 'numeric', 
+    month: 'long' 
+  });
+}
+---
+
+<section class="experiencia-section">
+  <h2>Experiencia Laboral</h2>
+  {experiencia && experiencia.length > 0 ? (
+    experiencia.map((exp) => (
+      <div class="experiencia-item">
+        <div class="experiencia-header">
+          <h3>{exp.puesto}</h3>
+          <span class="periodo">
+            {formatearFecha(exp.fecha_inicio)} - {exp.fecha_fin ? formatearFecha(exp.fecha_fin) : 'Presente'}
+          </span>
+        </div>
+        <p class="empresa">{exp.empresa}</p>
+        <p class="descripcion">{exp.descripcion}</p>
+      </div>
+    ))
+  ) : (
+    <p>No hay experiencia laboral disponible.</p>
+  )}
+</section>
+
+<style>
+  .experiencia-section {
+    margin: 2rem 0;
+    padding: 2rem;
+    background: #f9f9f9;
+    border-radius: 8px;
+  }
+  
+  .experiencia-section h2 {
+    color: #333;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #dc3545;
+    padding-bottom: 0.5rem;
+  }
+  
+  .experiencia-item {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+    border-left: 4px solid #dc3545;
+  }
+  
+  .experiencia-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .experiencia-header h3 {
+    color: #333;
+    margin: 0;
+    flex: 1;
+  }
+  
+  .periodo {
+    color: #666;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+  
+  .empresa {
+    color: #dc3545;
+    font-weight: 500;
+    margin: 0 0 1rem 0;
+  }
+  
+  .descripcion {
+    color: #555;
+    line-height: 1.6;
+    margin: 0;
+  }
+  
+  @media (max-width: 768px) {
+    .experiencia-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .periodo {
+      white-space: normal;
+    }
+  }
+</style>

@@ -1,11 +1,1727 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
+import ContactoSection from '../components/ContactoSection.astro';
+import EducacionSection from '../components/EducacionSection.astro';
+import ExperienciaSection from '../components/ExperienciaSection.astro';
+import HabilidadesSection from '../components/HabilidadesSection.astro';
+import CertificacionesSection from '../components/CertificacionesSection.astro';
+import { curriculumAPI } from '../lib/api.js';
+import blogPlaceholder from '../assets/blog-placeholder-about.jpg?url';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// Obtener todos los datos del curriculum desde la API de Laravel
+let curriculumData = null;
+let error = null;
+
+try {
+  const response = await curriculumAPI.getCurriculumCompleto();
+  curriculumData = response;
+  console.log('Datos del curriculum obtenidos:', curriculumData);
+} catch (err) {
+  error = err.message;
+  console.error('Error al obtener datos del curriculum:', err);
+}
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="Mi Portafolio - Desarrollador Full Stack" description="Desarrollador full stack especializado en tecnologías modernas, creando experiencias digitales excepcionales.">
+  <main>
+    <!-- Hero Section -->
+    <section id="hero" class="hero">
+      <div class="container">
+        <div class="hero-grid">
+          <div class="hero-content">
+            
+            <h1 class="hero-title">
+              Busco Chamba Aprendo Rápido
+            </h1>
+            <div class="hero-description">
+              <p>Soy un desarrollador full stack especializado en tecnologías web modernas.</p>
+            </div>
+            <div class="hero-actions">
+              <a href="#overview" class="cta-primary">Conoce más</a>
+              <div class="hero-links">
+                <span>Encuéntrame en</span>
+                <a href="https://github.com/JSTT09" target="_blank" rel="noopener noreferrer">GitHub</a>
+                <span>y</span>
+                <a href="https://www.linkedin.com/in/gerardo-flores-b91437264/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+              </div>
+            </div>
+          </div>
+          
+          <div class="hero-image">
+            <div class="image-container">
+              <div class="profile-image">
+                <img src={blogPlaceholder}
+                     alt="Desarrollador trabajando" 
+                     class="profile-img">
+                <div class="placeholder-avatar" style="display: none;">
+                  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="50" fill="var(--color-surface)"/>
+                    <circle cx="50" cy="40" r="15" fill="var(--color-secondary)"/>
+                    <path d="M25 85c0-13.8 11.2-25 25-25s25 11.2 25 25" fill="var(--color-secondary)"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation Dots -->
+    <nav class="nav-dots" aria-label="Navegación de secciones">
+      <a href="#hero" class="nav-dot active" aria-label="Inicio"></a>
+      <a href="#overview" class="nav-dot" aria-label="Resumen"></a>
+      <a href="#educacion" class="nav-dot" aria-label="Educación"></a>
+      <a href="#skills" class="nav-dot" aria-label="Habilidades"></a>
+      <a href="#idiomas" class="nav-dot" aria-label="Idiomas"></a>
+      <a href="#experience" class="nav-dot" aria-label="Experiencia"></a>
+      <a href="#contact" class="nav-dot" aria-label="Contacto"></a>
+      <a href="#certificaciones" class="nav-dot" aria-label="Certificaciones"></a>
+    </nav>
+
+    {error ? (
+      <section class="error-section">
+        <div class="container">
+          <div class="error-message">
+            <h2>Datos no disponibles temporalmente</h2>
+            <p>Mostrando información estática mientras se resuelve la conexión con el servidor.</p>
+          </div>
+        </div>
+      </section>
+    ) : null}
+
+    <!-- Overview/Historia Section -->
+    <section id="overview" class="section overview">
+      <div class="container">
+        <div class="overview-content">
+          <h2 class="section-title">Mi Historia</h2>
+          
+          {curriculumData?.historia && curriculumData.historia.length > 0 ? (
+            <div class="historia-grid">
+              {curriculumData.historia.map((item) => (
+                <div class="historia-item">
+                  <div class="historia-header">
+                    <h3 class="historia-titulo">{item.titulo}</h3>
+                    {(item.fecha_inicio || item.fecha_fin) && (
+                      <div class="historia-fechas">
+                        {item.fecha_inicio && new Date(item.fecha_inicio).getFullYear()}
+                        {item.fecha_fin && ` - ${new Date(item.fecha_fin).getFullYear()}`}
+                        {!item.fecha_fin && item.fecha_inicio && ' - Presente'}
+                      </div>
+                    )}
+                  </div>
+                  <p class="historia-descripcion">{item.descripcion}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div class="overview-text">
+              <p class="overview-subtitle">
+                Desarrollador con pasión por crear experiencias digitales excepcionales.
+              </p>
+              <p class="overview-description">
+                Si estás buscando iniciar un nuevo proyecto web, ponte en contacto conmigo para discutir 
+                tus requerimientos en detalle.
+              </p>
+            </div>
+          )}
+          
+          <a href="https://www.linkedin.com/in/gerardo-flores-b91437264/" target="_blank" rel="noopener noreferrer" class="cta-primary">Hablemos</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Educacion Carousel Section -->
+    <section id="educacion" class="section educacion-carousel">
+      <div class="container">
+        <div class="carousel-container">
+          <h2 class="section-title">Educación</h2>
+          
+          {curriculumData?.educacion && curriculumData.educacion.length > 0 ? (
+            <div class="carousel-content">
+              <div class="education-carousel">
+                {curriculumData.educacion.map((edu, index) => (
+                  <div class="education-slide" data-index={index}>
+                    <div class="education-card">
+                      <div class="education-header">
+                        <h3 class="education-title">{edu.titulo}</h3>
+                        <div class="education-institution">{edu.institucion}</div>
+                      </div>
+                      <div class="education-details">
+                        {edu.descripcion && (
+                          <p class="education-description">{edu.descripcion}</p>
+                        )}
+                        <div class="education-period">
+                          {edu.fecha_inicio && new Date(edu.fecha_inicio).getFullYear()}
+                          {edu.fecha_fin && ` - ${new Date(edu.fecha_fin).getFullYear()}`}
+                          {!edu.fecha_fin && edu.fecha_inicio && ' - Presente'}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <div class="carousel-controls">
+                <button class="carousel-btn prev" aria-label="Educación anterior">‹</button>
+                <div class="carousel-indicators">
+                  {curriculumData.educacion.map((_, index) => (
+                    <button class={`indicator ${index === 0 ? 'active' : ''}`} data-slide={index} aria-label={`Educación ${index + 1}`}></button>
+                  ))}
+                </div>
+                <button class="carousel-btn next" aria-label="Siguiente educación">›</button>
+              </div>
+            </div>
+          ) : (
+            <div class="education-placeholder">
+              <div class="education-card">
+                <div class="education-header">
+                  <h3 class="education-title">Formación Académica</h3>
+                  <div class="education-institution">Universidad / Instituto</div>
+                </div>
+                <div class="education-details">
+                  <p class="education-description">
+                    Información educativa disponible cuando se conecte con el servidor de datos.
+                  </p>
+                  <div class="education-period">2020 - 2024</div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills/Services Section -->
+    <section id="skills" class="section skills">
+      <div class="container">
+        <h2 class="section-title">Habilidades Técnicas</h2>
+        
+        <div class="skills-container">
+          <!-- Habilidades Técnicas -->
+          <div class="habilidades-section">
+            
+            {curriculumData?.habilidades && curriculumData.habilidades.length > 0 ? (
+              <div class="habilidades-grid">
+                {curriculumData.habilidades.map((habilidad) => (
+                  <div class="habilidad-item">
+                    <div class="habilidad-header">
+                      <span class="habilidad-nombre">{habilidad.nombre}</span>
+                      <span class="habilidad-categoria">{habilidad.categoria} <span class="nivel-texto">{habilidad.nivel}</span></span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div class="skills-placeholder">
+                <div class="tech-grid">
+                  {['React', 'Vue', 'TypeScript', 'Laravel', 'PHP', 'Node.js', 'MySQL', 'Docker'].map((tech) => (
+                    <div class="tech-item">
+                      <span class="tech-name">{tech}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Idiomas Section -->
+    <section id="idiomas" class="section idiomas">
+      <div class="container">
+        <h2 class="section-title">Idiomas</h2>
+        
+        <div class="idiomas-container">
+          <!-- Idiomas -->
+          <div class="idiomas-section">
+            
+            {curriculumData?.idiomas && curriculumData.idiomas.length > 0 ? (
+              <div class="idiomas-grid">
+                {curriculumData.idiomas.map((idioma) => (
+                  <div class="idioma-card">
+                    <div class="idioma-header">
+                      <span class="idioma-nombre">{idioma.idioma}</span>
+                      <span class="idioma-nivel">{idioma.nivel}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div class="idiomas-placeholder">
+                <div class="idioma-card">
+                  <div class="idioma-header">
+                    <span class="idioma-nombre">Español</span>
+                    <span class="idioma-nivel">Nativo</span>
+                  </div>
+                </div>
+                <div class="idioma-card">
+                  <div class="idioma-header">
+                    <span class="idioma-nombre">Inglés</span>
+                    <span class="idioma-nivel">Intermedio</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Experience/Projects Section -->
+    <section id="experience" class="section projects">
+      <div class="container">
+        <h2 class="section-title">Experiencia Laboral</h2>
+        
+        {curriculumData?.experiencia_laboral && curriculumData.experiencia_laboral.length > 0 ? (
+          <div class="experience-carousel-container">
+            <div class="experience-carousel">
+              {curriculumData.experiencia_laboral.map((exp, index) => (
+                <div class="experience-slide" data-index={index}>
+                  <div class="experience-card">
+                    <div class="experience-header">
+                      <h3 class="experience-title">{exp.cargo}</h3>
+                      <div class="experience-company">{exp.empresa}</div>
+                    </div>
+                    <div class="experience-content">
+                      <p class="experience-description">{exp.descripcion}</p>
+                      <div class="experience-period">
+                        {new Date(exp.fecha_inicio).getFullYear()} - {exp.fecha_fin ? new Date(exp.fecha_fin).getFullYear() : 'Presente'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div class="carousel-controls">
+              <button class="carousel-btn prev" aria-label="Experiencia anterior">‹</button>
+              <div class="carousel-indicators">
+                {curriculumData.experiencia_laboral.map((_, index) => (
+                  <button class={`indicator ${index === 0 ? 'active' : ''}`} data-slide={index} aria-label={`Experiencia ${index + 1}`}></button>
+                ))}
+              </div>
+              <button class="carousel-btn next" aria-label="Siguiente experiencia">›</button>
+            </div>
+          </div>
+        ) : (
+          <div class="experience-placeholder">
+            <div class="experience-grid">
+              <div class="experience-card">
+                <div class="experience-header">
+                  <h3 class="experience-title">Desarrollador Full Stack</h3>
+                  <div class="experience-company">Empresa Tecnológica</div>
+                </div>
+                <div class="experience-content">
+                  <p class="experience-description">
+                    Experiencia profesional disponible cuando se conecte con el servidor de datos.
+                  </p>
+                  <div class="experience-period">2022 - Presente</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section contact">
+      <div class="container">
+        <div class="contact-content">
+          <h2 class="contact-title">Es momento de construir tu próximo proyecto web.</h2>
+          <p class="contact-subtitle">Trabajemos juntos y hagámoslo exitoso.</p>
+          
+          {curriculumData?.contacto ? (
+            <div class="contact-info-grid">
+              <div class="contact-primary">
+                <a href={`mailto:${curriculumData.contacto.email}`} class="contact-email">
+                  {curriculumData.contacto.email}
+                </a>
+              </div>
+              
+              <div class="contact-details">
+                {curriculumData.contacto.telefono && (
+                  <div class="contact-item">
+                    <span class="contact-label">Teléfono</span>
+                    <a href={`tel:${curriculumData.contacto.telefono}`} class="contact-link">
+                      {curriculumData.contacto.telefono}
+                    </a>
+                  </div>
+                )}
+                
+                {curriculumData.contacto.direccion && (
+                  <div class="contact-item">
+                    <span class="contact-label">Ubicación</span>
+                    <span class="contact-text">{curriculumData.contacto.direccion}</span>
+                  </div>
+                )}
+                
+                {curriculumData.contacto.linkedin && (
+                  <div class="contact-item">
+                    <span class="contact-label">LinkedIn</span>
+                    <a href={curriculumData.contacto.linkedin} target="_blank" rel="noopener noreferrer" class="contact-link">
+                      Ver perfil
+                    </a>
+                  </div>
+                )}
+                
+                {curriculumData.contacto.website && (
+                  <div class="contact-item">
+                    <span class="contact-label">Sitio web</span>
+                    <a href={curriculumData.contacto.website} target="_blank" rel="noopener noreferrer" class="contact-link">
+                      {curriculumData.contacto.website}
+                    </a>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div class="contact-fallback">
+              <a href="mailto:contacto@example.com" class="contact-email">
+                contacto@example.com
+              </a>
+              <p class="contact-note">
+                Información de contacto disponible cuando se conecte con el servidor de datos.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+
+    <!-- Certificaciones Section -->
+    <section id="certificaciones" class="section certificaciones">
+      <div class="container">
+        <h2 class="section-title">Certificaciones</h2>
+        
+        {curriculumData?.certificaciones && curriculumData.certificaciones.length > 0 ? (
+          <div class="certificaciones-carousel-container">
+            <div class="certificaciones-carousel">
+              {curriculumData.certificaciones.map((cert, index) => (
+                <div class="certificacion-slide" data-index={index}>
+                  <div class="certificacion-card">
+                    <div class="certificacion-header">
+                      <h3 class="certificacion-titulo">{cert.titulo}</h3>
+                      <div class="certificacion-emisor">Certificación Profesional</div>
+                    </div>
+                    <div class="certificacion-content">
+                      <div class="certificacion-details">
+                        
+                        {cert.archivo_pdf && (
+                          <a href={cert.archivo_pdf} target="_blank" rel="noopener noreferrer" class="certificacion-verify">
+                            📄 Ver certificado
+                          </a>
+                        )}
+                        
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div class="carousel-controls">
+              <button class="carousel-btn prev" aria-label="Certificación anterior">‹</button>
+              <div class="carousel-indicators">
+                {curriculumData.certificaciones.map((_, index) => (
+                  <button class={`indicator ${index === 0 ? 'active' : ''}`} data-slide={index} aria-label={`Certificación ${index + 1}`}></button>
+                ))}
+              </div>
+              <button class="carousel-btn next" aria-label="Siguiente certificación">›</button>
+            </div>
+          </div>
+        ) : (
+          <div class="certificaciones-placeholder">
+            <div class="certificaciones-grid">
+              <div class="certificacion-card">
+                <div class="certificacion-header">
+                  <h3 class="certificacion-titulo">Certificación Profesional</h3>
+                  <div class="certificacion-emisor">Institución Certificadora</div>
+                </div>
+                <div class="certificacion-content">
+                  <p class="certificacion-descripcion">
+                    Certificaciones profesionales disponibles cuando se conecte con el servidor de datos.
+                  </p>
+                  <div class="certificacion-details">
+                    <div class="certificacion-fecha">Obtenida: 2024</div>
+                  </div>
+                </div>
+              </div>
+              <div class="certificacion-card">
+                <div class="certificacion-header">
+                  <h3 class="certificacion-titulo">Curso Especializado</h3>
+                  <div class="certificacion-emisor">Plataforma de Educación</div>
+                </div>
+                <div class="certificacion-content">
+                  <p class="certificacion-descripcion">
+                    Cursos y certificaciones técnicas completadas.
+                  </p>
+                  <div class="certificacion-details">
+                    <div class="certificacion-fecha">Obtenida: 2024</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-links">
+            <a href="https://github.com/JSTT09" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a href="https://www.linkedin.com/in/gerardo-flores-b91437264/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+          </div>
+          <div class="footer-status">
+            <span class="status-indicator"></span>
+            Disponible para nuevos proyectos
+          </div>
+        </div>
+      </div>
+    </footer>
+  </main>
 </Layout>
+
+<style>
+  /* Hero Section */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: var(--spacing-4xl) 0;
+    background: var(--color-background);
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--spacing-4xl);
+    align-items: center;
+    max-width: 1200px;
+  }
+
+  .hero-content {
+    max-width: 600px;
+  }
+
+  .hero-status {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-xl);
+    font-size: var(--font-size-sm);
+    color: var(--color-secondary);
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  .hero-title {
+    font-size: clamp(var(--font-size-4xl), 6vw, var(--font-size-6xl));
+    font-weight: 600;
+    line-height: 1.1;
+    margin-bottom: var(--spacing-2xl);
+    color: var(--color-primary);
+  }
+
+  .hero-description {
+    margin-bottom: var(--spacing-2xl);
+  }
+
+  .hero-description p {
+    font-size: var(--font-size-lg);
+    color: var(--color-secondary);
+    margin-bottom: var(--spacing-lg);
+    line-height: 1.6;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+  }
+
+  .cta-primary {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--spacing-base) var(--spacing-xl);
+    background: var(--color-primary);
+    color: var(--color-background);
+    border-radius: 50px;
+    font-weight: 500;
+    transition: var(--transition);
+    width: fit-content;
+  }
+
+  .cta-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(255, 255, 255, 0.1);
+  }
+
+  .hero-links {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    color: var(--color-secondary);
+  }
+
+  .hero-links a {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  .hero-image {
+    width: 300px;
+    height: 300px;
+  }
+
+  .image-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  .profile-image {
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .placeholder-avatar {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-surface);
+    border-radius: 20px;
+  }
+
+  /* Navigation Dots */
+  .nav-dots {
+    position: fixed;
+    right: var(--spacing-xl);
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-base);
+    z-index: 100;
+  }
+
+  .nav-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--color-border);
+    transition: var(--transition);
+    border: none;
+    cursor: pointer;
+  }
+
+  .nav-dot:hover,
+  .nav-dot.active {
+    background: var(--color-accent);
+    transform: scale(1.2);
+  }
+
+  /* Sections */
+  .section {
+    padding: var(--section-spacing) 0;
+  }
+
+  .section-title {
+    font-size: var(--font-size-3xl);
+    margin-bottom: var(--spacing-2xl);
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+
+  /* Overview/Historia Section */
+  .overview {
+    background: var(--color-surface);
+  }
+
+  .overview-content {
+    width: 100%;
+    max-width: none;
+    padding: 0 clamp(1rem, 5vw, 3rem);
+  }
+
+  .overview-subtitle {
+    font-size: var(--font-size-xl);
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-xl);
+    font-weight: 500;
+  }
+
+  .overview-description {
+    font-size: var(--font-size-lg);
+    color: var(--color-secondary);
+    margin-bottom: var(--spacing-2xl);
+    line-height: 1.6;
+  }
+
+  .historia-grid {
+    display: grid;
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-2xl);
+    width: 100%;
+  }
+
+  .historia-item {
+    background: var(--color-card);
+    padding: clamp(1rem, 3vw, 2rem);
+    border-radius: 12px;
+    border: 1px solid var(--color-border);
+    transition: var(--transition);
+    width: 100%;
+    max-width: none;
+  }
+
+  .historia-item:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+  }
+
+  .historia-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-base);
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+
+  .historia-titulo {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--color-primary);
+    margin: 0;
+  }
+
+  .historia-fechas {
+    font-size: var(--font-size-sm);
+    color: var(--color-accent);
+    font-weight: 500;
+  }
+
+  .historia-descripcion {
+    color: var(--color-secondary);
+    line-height: 1.6;
+    margin: 0;
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    text-align: justify;
+  }
+
+  /* Educacion Carousel Section */
+  .educacion-carousel {
+    background: var(--color-background);
+    padding: var(--spacing-4xl) 0;
+  }
+
+  .carousel-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .carousel-content {
+    position: relative;
+  }
+
+  .education-carousel {
+    position: relative;
+    border-radius: 12px;
+  }
+
+  .education-slide {
+    display: none;
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .education-slide:first-child {
+    display: block;
+  }
+
+  .education-card {
+    background: var(--color-card);
+    padding: var(--spacing-2xl);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    text-align: center;
+    transition: var(--transition);
+  }
+
+  .education-card:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+  }
+
+  .education-header {
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .education-title {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--color-primary);
+    margin: 0 0 var(--spacing-sm) 0;
+  }
+
+  .education-institution {
+    font-size: var(--font-size-base);
+    color: var(--color-accent);
+    font-weight: 500;
+  }
+
+  .education-description {
+    color: var(--color-secondary);
+    line-height: 1.6;
+    margin: 0 0 var(--spacing-base) 0;
+  }
+
+  .education-period {
+    font-size: var(--font-size-sm);
+    color: var(--color-tertiary);
+    font-weight: 500;
+  }
+
+  .education-placeholder .education-card {
+    border: 1px dashed var(--color-border);
+  }
+
+  .carousel-indicators {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-base);
+    margin-top: var(--spacing-xl);
+  }
+
+  /* Testimonials Section */
+  .testimonials {
+    background: var(--color-background);
+    padding: var(--spacing-4xl) 0;
+  }
+
+  .testimonial-container {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .testimonial-quote {
+    font-size: var(--font-size-2xl);
+    line-height: 1.4;
+    color: var(--color-primary);
+    font-style: italic;
+    margin: 0 0 var(--spacing-2xl) 0;
+    font-weight: 400;
+  }
+
+  .testimonial-author {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--spacing-2xl);
+  }
+
+  .author-info {
+    text-align: center;
+  }
+
+  .author-name {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .author-title {
+    font-size: var(--font-size-base);
+    color: var(--color-secondary);
+  }
+
+  .testimonial-indicators {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-base);
+  }
+
+  .indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-border);
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .indicator.active,
+  .indicator:hover {
+    background: var(--color-accent);
+  }
+
+  /* Skills Section */
+  .skills {
+    background: var(--color-surface);
+  }
+
+  .skills-container {
+    display: grid;
+    gap: var(--spacing-4xl);
+  }
+
+  /* Idiomas Section */
+  .idiomas {
+    background: var(--color-surface);
+  }
+
+  .idiomas-container {
+    display: grid;
+    gap: var(--spacing-4xl);
+  }
+
+  .subsection-title {
+    font-size: var(--font-size-2xl);
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-2xl);
+    text-align: center;
+  }
+
+  .habilidades-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-2xl);
+  }
+
+  .habilidad-item {
+    background: var(--color-card);
+    padding: var(--spacing-lg);
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    transition: var(--transition);
+  }
+
+  .habilidad-item:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+  }
+
+  .habilidad-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-base);
+  }
+
+  .habilidad-nombre {
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+
+  .habilidad-categoria {
+    background: var(--color-accent);
+    color: white;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: 12px;
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+  }
+
+  .habilidad-nivel {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  .nivel-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--color-border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .nivel-fill {
+    height: 100%;
+    background: var(--color-accent);
+    border-radius: 3px;
+    width: 85%; /* Default fallback */
+    transition: width 0.5s ease;
+  }
+
+  .nivel-texto {
+    font-size: var(--font-size-sm);
+    color: white;
+    min-width: 60px;
+    text-align: right;
+  }
+
+  /* Idiomas Section */
+  .idiomas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-lg);
+  }
+
+  .idioma-card {
+    background: var(--color-card);
+    padding: var(--spacing-lg);
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    transition: var(--transition);
+  }
+
+  .idioma-card:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+  }
+
+  .idioma-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-base);
+  }
+
+  .idioma-nombre {
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+
+  .idioma-nivel {
+    background: var(--color-accent);
+    color: white;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: 12px;
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+  }
+
+  .idioma-progress {
+    margin-top: var(--spacing-sm);
+  }
+
+  .progress-bar {
+    height: 4px;
+    background: var(--color-border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--color-accent);
+    border-radius: 2px;
+    width: 70%; /* Default fallback */
+    transition: width 0.5s ease;
+  }
+
+  .skills-placeholder,
+  .idiomas-placeholder {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-base);
+    justify-content: center;
+  }
+
+  .tech-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    justify-content: center;
+  }
+
+  .tech-item {
+    padding: var(--spacing-xs) var(--spacing-base);
+    background: var(--color-card);
+    border-radius: 20px;
+    border: 1px solid var(--color-border);
+    transition: var(--transition);
+  }
+
+  .tech-item:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-1px);
+    background: var(--color-muted);
+  }
+
+  .tech-name {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--color-primary);
+  }
+
+  /* Projects/Experience Section */
+  .projects {
+    background: var(--color-background);
+  }
+
+  .experience-carousel-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .experience-carousel {
+    position: relative;
+    border-radius: 12px;
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .experience-slide {
+    display: none;
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .experience-slide:first-child {
+    display: block;
+  }
+
+  .experience-card {
+    background: var(--color-card);
+    padding: var(--spacing-2xl);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    transition: var(--transition);
+    text-align: center;
+  }
+
+  .experience-card:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+  }
+
+  .experience-header {
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .experience-title {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-primary);
+  }
+
+  .experience-company {
+    color: var(--color-accent);
+    font-weight: 500;
+    font-size: var(--font-size-base);
+  }
+
+  .experience-content {
+    text-align: left;
+  }
+
+  .experience-description {
+    color: var(--color-secondary);
+    line-height: 1.6;
+    margin: 0 0 var(--spacing-base) 0;
+  }
+
+  .experience-period {
+    font-size: var(--font-size-sm);
+    color: var(--color-tertiary);
+    font-weight: 500;
+  }
+
+  .carousel-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2xl);
+    margin-top: var(--spacing-xl);
+  }
+
+  .carousel-btn {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--color-border);
+    background: var(--color-card);
+    color: var(--color-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: var(--font-size-lg);
+  }
+
+  .carousel-btn:hover {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+    color: white;
+  }
+
+  .experience-placeholder {
+    text-align: center;
+  }
+
+  .experience-placeholder .experience-card {
+    border: 1px dashed var(--color-border);
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .experience-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: var(--spacing-xl);
+  }
+
+  /* Contact Section */
+  .contact {
+    text-align: center;
+    padding: var(--spacing-4xl) 0;
+    background: var(--color-surface);
+  }
+
+  .contact-title {
+    font-size: var(--font-size-4xl);
+    font-weight: 600;
+    margin-bottom: var(--spacing-base);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    color: var(--color-primary);
+  }
+
+  .contact-subtitle {
+    font-size: var(--font-size-xl);
+    color: var(--color-secondary);
+    margin-bottom: var(--spacing-2xl);
+  }
+
+  .contact-info-grid {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .contact-primary {
+    margin-bottom: var(--spacing-2xl);
+  }
+
+  .contact-email {
+    font-size: var(--font-size-2xl);
+    font-weight: 600;
+    color: var(--color-accent);
+    text-decoration: underline;
+    transition: var(--transition);
+  }
+
+  .contact-email:hover {
+    opacity: 0.8;
+  }
+
+  .contact-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-xl);
+  }
+
+  .contact-item {
+    background: var(--color-card);
+    padding: var(--spacing-lg);
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    text-align: left;
+    transition: var(--transition);
+  }
+
+  .contact-item:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+  }
+
+  .contact-label {
+    display: block;
+    font-size: var(--font-size-sm);
+    color: var(--color-secondary);
+    margin-bottom: var(--spacing-xs);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .contact-link {
+    color: var(--color-accent);
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition);
+  }
+
+  .contact-link:hover {
+    text-decoration: underline;
+  }
+
+  .contact-text {
+    color: var(--color-primary);
+    font-weight: 500;
+  }
+
+  .contact-fallback {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-base);
+  }
+
+  .contact-note {
+    font-size: var(--font-size-sm);
+    color: var(--color-secondary);
+    font-style: italic;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Footer */
+  .footer {
+    padding: var(--spacing-2xl) 0;
+    border-top: 1px solid var(--color-border);
+    background: var(--color-background);
+  }
+
+  .footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: var(--spacing-xl);
+  }
+
+  .footer-links a {
+    color: var(--color-secondary);
+    font-weight: 500;
+  }
+
+  .footer-status {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    color: var(--color-secondary);
+    font-size: var(--font-size-sm);
+  }
+
+  .status-indicator {
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  /* Certificaciones Section */
+  .certificaciones {
+    background: var(--color-background);
+  }
+
+  .certificaciones-carousel-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .certificaciones-carousel {
+    position: relative;
+    border-radius: 12px;
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .certificacion-slide {
+    display: none;
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .certificacion-slide:first-child {
+    display: block;
+  }
+
+  .certificacion-card {
+    background: var(--color-card);
+    padding: var(--spacing-2xl);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    transition: var(--transition);
+    text-align: center;
+  }
+
+  .certificacion-card:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+  }
+
+  .certificacion-header {
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .certificacion-titulo {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-primary);
+  }
+
+  .certificacion-emisor {
+    color: var(--color-accent);
+    font-weight: 500;
+    font-size: var(--font-size-base);
+  }
+
+  .certificacion-content {
+    text-align: left;
+  }
+
+  .certificacion-descripcion {
+    color: var(--color-secondary);
+    line-height: 1.6;
+    margin: 0 0 var(--spacing-lg) 0;
+  }
+
+  .certificacion-details {
+    display: grid;
+    gap: var(--spacing-sm);
+  }
+
+  .certificacion-fecha,
+  .certificacion-vencimiento,
+  .certificacion-credencial {
+    font-size: var(--font-size-sm);
+    color: var(--color-tertiary);
+    font-weight: 500;
+  }
+
+  .certificacion-verify {
+    display: inline-block;
+    margin-top: var(--spacing-base);
+    color: var(--color-accent);
+    text-decoration: none;
+    font-weight: 500;
+    padding: var(--spacing-xs) var(--spacing-base);
+    border: 1px solid var(--color-accent);
+    border-radius: 6px;
+    transition: var(--transition);
+    font-size: var(--font-size-sm);
+  }
+
+  .certificacion-verify:hover {
+    background: var(--color-accent);
+    color: white;
+  }
+
+  .certificaciones-placeholder {
+    text-align: center;
+  }
+
+  .certificaciones-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: var(--spacing-xl);
+  }
+
+  .certificaciones-placeholder .certificacion-card {
+    border: 1px dashed var(--color-border);
+  }
+
+  /* Error Section */
+  .error-section {
+    padding: var(--spacing-2xl) 0;
+    background: var(--color-surface);
+  }
+
+  .error-message {
+    text-align: center;
+    padding: var(--spacing-2xl);
+    background: var(--color-card);
+    border: 1px solid #fbbf24;
+    border-radius: 8px;
+    color: var(--color-secondary);
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .nav-dots {
+      display: none;
+    }
+
+    .hero-grid {
+      grid-template-columns: 1fr;
+      text-align: center;
+      gap: var(--spacing-2xl);
+    }
+
+    .hero-image {
+      order: -1;
+      width: 250px;
+      height: 250px;
+      margin: 0 auto;
+    }
+
+    .skills-grid {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-2xl);
+    }
+  }
+
+  @media (max-width: 768px) {
+    :root {
+      --container-padding: var(--spacing-base);
+      --section-spacing: var(--spacing-3xl);
+    }
+
+    .hero {
+      min-height: 80vh;
+      padding: var(--spacing-2xl) 0;
+    }
+
+    .hero-title {
+      font-size: var(--font-size-3xl);
+    }
+
+    .hero-description p {
+      font-size: var(--font-size-base);
+    }
+
+    .hero-image {
+      width: 200px;
+      height: 200px;
+    }
+
+    .testimonial-quote {
+      font-size: var(--font-size-lg);
+    }
+
+    .skills-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .experience-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .contact-title {
+      font-size: var(--font-size-2xl);
+    }
+
+    .contact-email {
+      font-size: var(--font-size-lg);
+    }
+
+    .footer-content {
+      flex-direction: column;
+      gap: var(--spacing-base);
+      text-align: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .tech-grid {
+      justify-content: center;
+    }
+
+    .cta-primary {
+      padding: var(--spacing-sm) var(--spacing-lg);
+    }
+
+    .hero-actions {
+      align-items: center;
+    }
+
+    .hero-links {
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Función para inicializar carruseles
+    function initCarousel(carouselSelector, slideSelector, indicatorSelector, prevBtnSelector = null, nextBtnSelector = null) {
+      const carousel = document.querySelector(carouselSelector);
+      if (!carousel) return;
+      
+      const slides = carousel.querySelectorAll(slideSelector);
+      const indicators = document.querySelectorAll(indicatorSelector);
+      const prevBtn = prevBtnSelector ? document.querySelector(prevBtnSelector) : null;
+      const nextBtn = nextBtnSelector ? document.querySelector(nextBtnSelector) : null;
+      
+      let currentSlide = 0;
+      
+      function showSlide(index) {
+        // Ocultar todas las diapositivas
+        slides.forEach(slide => {
+          slide.style.display = 'none';
+        });
+        
+        // Mostrar la diapositiva actual
+        if (slides[index]) {
+          slides[index].style.display = 'block';
+        }
+        
+        // Actualizar indicadores
+        indicators.forEach((indicator, i) => {
+          if (i === index) {
+            indicator.classList.add('active');
+          } else {
+            indicator.classList.remove('active');
+          }
+        });
+        
+        currentSlide = index;
+      }
+      
+      function nextSlide() {
+        const next = (currentSlide + 1) % slides.length;
+        showSlide(next);
+      }
+      
+      function prevSlide() {
+        const prev = (currentSlide - 1 + slides.length) % slides.length;
+        showSlide(prev);
+      }
+      
+      // Event listeners para indicadores
+      indicators.forEach((indicator, index) => {
+        indicator.addEventListener('click', () => {
+          showSlide(index);
+        });
+      });
+      
+      // Event listeners para botones de navegación
+      if (nextBtn) {
+        nextBtn.addEventListener('click', nextSlide);
+      }
+      
+      if (prevBtn) {
+        prevBtn.addEventListener('click', prevSlide);
+      }
+      
+      // Auto-play opcional (cada 5 segundos)
+      // setInterval(nextSlide, 5000);
+      
+      // Mostrar la primera diapositiva
+      showSlide(0);
+    }
+    
+    // Inicializar carrusel de educación
+    initCarousel(
+      '.education-carousel',
+      '.education-slide',
+      '.educacion-carousel .carousel-indicators .indicator',
+      '.educacion-carousel .carousel-btn.prev',
+      '.educacion-carousel .carousel-btn.next'
+    );
+    
+    // Inicializar carrusel de experiencia
+    initCarousel(
+      '.experience-carousel',
+      '.experience-slide',
+      '.experience-carousel-container .carousel-indicators .indicator',
+      '.experience-carousel-container .carousel-btn.prev',
+      '.experience-carousel-container .carousel-btn.next'
+    );
+
+    // Inicializar carrusel de certificaciones
+    initCarousel(
+      '.certificaciones-carousel',
+      '.certificacion-slide',
+      '.certificaciones-carousel-container .carousel-indicators .indicator',
+      '.certificaciones-carousel-container .carousel-btn.prev',
+      '.certificaciones-carousel-container .carousel-btn.next'
+    );
+
+    // Navegación por puntos
+    const navDots = document.querySelectorAll('.nav-dot');
+    const sections = document.querySelectorAll('section[id]');
+    
+    // Configurar smooth scroll para los puntos de navegación
+    navDots.forEach(dot => {
+      dot.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = e.currentTarget as HTMLAnchorElement;
+        const targetId = target.getAttribute('href');
+        
+        if (targetId) {
+          const targetSection = document.querySelector(targetId);
+          
+          if (targetSection) {
+            targetSection.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }
+        }
+      });
+    });
+
+    // Observador de intersección para activar puntos según la sección visible
+    const observerOptions = {
+      root: null,
+      rootMargin: '-50% 0px -50% 0px',
+      threshold: 0
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const activeSection = entry.target;
+          const sectionId = activeSection.id;
+          
+          // Remover clase active de todos los puntos
+          navDots.forEach(dot => dot.classList.remove('active'));
+          
+          // Agregar clase active al punto correspondiente
+          const activeDot = document.querySelector(`.nav-dot[href="#${sectionId}"]`);
+          if (activeDot) {
+            activeDot.classList.add('active');
+          }
+        }
+      });
+    }, observerOptions);
+
+    // Observar todas las secciones
+    sections.forEach(section => {
+      observer.observe(section);
+    });
+  });
+</script>

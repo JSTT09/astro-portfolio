@@ -1,0 +1,217 @@
+---
+// Componente para mostrar certificaciones
+export interface Props {
+  certificaciones: Array<{
+    id: number;
+    titulo: string;
+    archivo_pdf: string;
+  }>;
+}
+
+const { certificaciones } = Astro.props;
+---
+
+<section class="certificaciones-section">
+  <h2>Certificaciones</h2>
+  {certificaciones && certificaciones.length > 0 ? (
+    <div class="certificaciones-grid">
+      {certificaciones.map((cert) => (
+        <div class="certificacion-item">
+          <div class="certificacion-pdf">
+            <embed 
+              src={cert.archivo_pdf} 
+              type="application/pdf"
+              width="100%"
+              height="300"
+            />
+            <div class="pdf-fallback">
+              <a 
+                href={cert.archivo_pdf} 
+                target="_blank"
+                rel="noopener noreferrer"
+                class="pdf-link"
+              >
+                📄 Ver PDF: {cert.titulo}
+              </a>
+            </div>
+          </div>
+          <div class="certificacion-info">
+            <h4>{cert.titulo}</h4>
+            <div class="certificacion-actions">
+              <a 
+                href={cert.archivo_pdf} 
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn-ver-pdf"
+              >
+                Ver PDF Completo
+              </a>
+              <a 
+                href={cert.archivo_pdf} 
+                download={`${cert.titulo}.pdf`}
+                class="btn-descargar"
+              >
+                Descargar
+              </a>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p>No hay certificaciones disponibles.</p>
+  )}
+</section>
+
+<style>
+  .certificaciones-section {
+    margin: 2rem 0;
+    padding: 2rem;
+    background: #f9f9f9;
+    border-radius: 8px;
+  }
+  
+  .certificaciones-section h2 {
+    color: #333;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #17a2b8;
+    padding-bottom: 0.5rem;
+  }
+  
+  .certificaciones-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .certificacion-item {
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-left: 4px solid #17a2b8;
+  }
+  
+  .certificacion-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  
+  .certificacion-pdf {
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+    background: #f8f9fa;
+    position: relative;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .certificacion-pdf embed {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+  
+  .pdf-fallback {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 1rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: none;
+  }
+  
+  .pdf-link {
+    color: #17a2b8;
+    text-decoration: none;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .pdf-link:hover {
+    color: #138496;
+    text-decoration: underline;
+  }
+  
+  .certificacion-info {
+    padding: 1.5rem;
+  }
+  
+  .certificacion-info h4 {
+    color: #333;
+    margin: 0 0 1rem 0;
+    line-height: 1.4;
+    text-align: center;
+  }
+  
+  .certificacion-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .btn-ver-pdf,
+  .btn-descargar {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    text-align: center;
+    border: 1px solid transparent;
+  }
+  
+  .btn-ver-pdf {
+    background: #17a2b8;
+    color: white;
+  }
+  
+  .btn-ver-pdf:hover {
+    background: #138496;
+    transform: translateY(-1px);
+  }
+  
+  .btn-descargar {
+    background: #28a745;
+    color: white;
+  }
+  
+  .btn-descargar:hover {
+    background: #218838;
+    transform: translateY(-1px);
+  }
+  
+  @media (max-width: 768px) {
+    .certificaciones-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .certificacion-pdf {
+      height: 250px;
+    }
+    
+    .certificacion-actions {
+      flex-direction: column;
+    }
+    
+    .btn-ver-pdf,
+    .btn-descargar {
+      width: 100%;
+    }
+  }
+  
+  /* Fallback para navegadores que no soportan PDF embed */
+  @supports not (display: flex) {
+    .pdf-fallback {
+      display: block !important;
+    }
+  }
+</style>
