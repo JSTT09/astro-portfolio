@@ -19,6 +19,22 @@ try {
 } catch (err) {
   error = err.message;
   console.error('Error al obtener datos del curriculum:', err);
+  // Fallback data en caso de error con la API
+  curriculumData = {
+    contacto: {
+      email: '',
+      telefono: '',
+      direccion: '',
+      linkedin: '',
+      website: ''
+    },
+    educacion: [],
+    habilidades: [],
+    idiomas: [],
+    experiencia_laboral: [],
+    certificaciones: [],
+    historia: []
+  };
 }
 ---
 
